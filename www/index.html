@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hello wasm-pack!</title>
+<style>
+.flex-container {
+    display: flex;
+}
+.flex-container > div {
+    padding: 1em;
+}
+
+</style>
+  </head>
+  <body>
+    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+    <div class="flex-container">
+    <div>
+    <canvas id="canvas"></canvas>
+    </div>
+    <div>
+    <label for="sequence">Choose a sequence: </label>
+    <select name="sequence" id="sequence"></select>
+    <br>
+    Color Scheme: 
+    <br>
+    <button id="add_color">+</button><button id="remove_color">-</button>
+    <table id="colorpicker">
+    </table>
+    </div>
+    </div>
+    <div class="flex-container">
+    <div>
+        Number Walls 
+
+        
+    </div>
+    </div>
+    <script src="./bootstrap.js"></script>
+  </body>
+</html>
