@@ -1,6 +1,6 @@
 mod utils;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap, VecDeque};
 
 use js_sys::BigInt;
 use wasm_bindgen::prelude::*;
@@ -43,10 +43,68 @@ fn knight(n: i32) -> BigInt {
     rook(n+1) - rook(n-1)
 }
 
+// start is the offset for the index to allow for storing data in an arbitrary
+// place in 1-D space
+#[derive(Debug)]
+struct OffsetArray<T> {
+    start: i32,
+    array: VecDeque<T>
+}
+
+
+// need to start with a value since it will be off by one otherwise, or there
+// needs to be an empty check or empty data type that gets promoted
+impl<T> OffsetArray<T> {
+    fn new(n: i32, v: T) -> Self {
+        OffsetArray { start: n, array: VecDeque::from(vec![v]) }
+    }
+
+    fn len(&self) -> usize {
+        self.array.len()
+    }
+
+    // for i in (self.start()..self.end()) {
+    //     self.get(i)
+    // }
+    fn end(&self) -> i32 {
+        self.start + (self.len() as i32)
+    }
+
+    fn get(&self, n: i32) -> Option<&T> {
+        if n >= self.start && n < self.end() {
+            self.array.get((n-self.start).try_into().unwrap())
+        } else {
+            None
+        }
+    }
+
+    fn insert(&mut self, n: i32, v: T) {
+        if n < self.start {
+            self.push_front(v);
+        } else if n >= self.end() {
+            self.push_back(v);
+        } else {
+            self.array.insert((n-self.start).try_into().unwrap(), v);
+        }
+    }
+
+    fn push_front(&mut self, v: T) {
+        self.start -= 1;
+        self.array.push_front(v);
+    }
+
+    fn push_back(&mut self, v: T) {
+        self.array.push_back(v)
+    }
+}
+
+
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct Wall {
+    //memo: OffsetArray<OffsetArray<BigInt>>,
     memo: HashMap<(i32, i32), BigInt>,
+    //memo: BTreeMap<i32,BTreeMap<i32, BigInt>>,
     function: Function,
 }
 
@@ -60,12 +118,19 @@ pub enum Function {
     Knight,
 }
 
-
-
 #[wasm_bindgen]
 impl Wall {
     pub fn new(function: Function) -> Self {
+        let v = match function {
+            Function::Square => square(0),
+            Function::Knight => knight(0),
+            Function::Rook => rook(0),
+            Function::DeBruijn => binary(0),
+            Function::Rueppel => rueppel(0),
+        };
+        //Wall { memo: OffsetArray::new(0, OffsetArray::new(0, v)), function }
         Wall { memo: HashMap::new(), function }
+        //Wall { memo: BTreeMap::new(), function }
     }
 
     fn func(&self, n: i32) -> BigInt {
@@ -77,15 +142,44 @@ impl Wall {
             Function::Knight => knight(n),
         }
     }
+    /*
+    fn memo_get(&self, m: i32, n: i32) -> Option<BigInt> {
+        self.memo.get(m)
+            .and_then(|x| x.get(n).cloned())
+    }
+    */
+
+    /*
+    fn memo_insert(&mut self, m: i32, n: i32, v: BigInt) {
+        self.memo.entry(m)
+            .and_modify(|data| {data.insert(n, v.clone());})
+            .or_insert_with(|| {
+                let mut new = BTreeMap::new();
+                new.insert(n, v);
+                new
+            });
+    }
+    */
+    /*
+    fn memo_insert(&mut self, m: i32, n: i32, v: BigInt) {
+        if let Some(inner) = self.memo.array.get_mut(m.try_into().unwrap()) {
+            inner.insert(n, v);
+        } else {
+            self.memo.insert(m, OffsetArray::new(n, v))
+        }
+    }
+    */
 
     pub fn get(&mut self, m: i32, n: i32) -> BigInt {
         if let Some(v) = self.memo.get(&(m, n)) {
+        //if let Some(v) = self.memo_get(m, n) {
             v.clone()
         } else {
             let v = self.get_item(m, n);
             // no point wasting space on really trivial things
             if m > -1 {
                 self.memo.insert((m,n), v.clone());
+                //self.memo_insert(m, n, v.clone());
             }
             v
         }

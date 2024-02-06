@@ -1,11 +1,11 @@
 import { Wall, Function } from "wall";
 import { InteractiveCanvas } from "interactive_canvas";
 
-var wall = Wall.new(Function.Rueppel);
+let wall = Wall.new(Function.Rueppel);
 
-var modulus = 2n;
+let modulus = 2n;
 
-var colorTable = [
+let colorTable = [
     "#FFFFFF",
     "#000000",
 ]
@@ -18,7 +18,7 @@ canvas.style.outlineColor = "black";
 canvas.style.outlineWidth = "3px";
 canvas.style.outlineStyle = "solid";
 const GRID_SIZE = 20;
-var GRID_LINES = false;
+let GRID_LINES = false;
 
 // selector setup
 const func_select = document.getElementById("sequence");
@@ -30,12 +30,12 @@ const functions = {
     "knight": Function.Knight,
 };
 func_select.addEventListener("change", (event) => {
-    var val = event.target.value;
+    let val = event.target.value;
     wall = Wall.new(functions[val]);
 });
 
 for (let name in functions) {
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.innerText = name;
     option.value = name;
     if (name == 'rueppel') {
@@ -46,12 +46,12 @@ for (let name in functions) {
 
 // color picker setup
 function create_color_row(index, default_color) {
-    var row = document.createElement('tr');
-    var cell = document.createElement('td');
-    var pick = document.createElement('input');
+    let row = document.createElement('tr');
+    let cell = document.createElement('td');
+    let pick = document.createElement('input');
     pick.type = "color";
     pick.value = default_color;
-    pick.onchange = (event) => {
+    pick.oninput = (event) => {
         colorTable[index] = event.target.value;
     }
     cell.appendChild(pick);
@@ -67,7 +67,7 @@ create_color_row(0, "#FFFFFF");
 create_color_row(1, "#000000");
 
 add_color.addEventListener("click", (event) => {
-    var color = "#000000";
+    let color = "#000000";
     colorTable.push(color);
     create_color_row(colorTable.length - 1, color);
     modulus += 1n;
@@ -90,37 +90,37 @@ function draw(ctx) {
     // grid should line up at 0,0
     // render just off screen, so round down on p1 and round up on p2
 
-    var p1 = ctx.transformedPoint(0,0);
-    var p2 = ctx.transformedPoint(canvas.width,canvas.height);
-    var start_row = Math.ceil(p1.x/GRID_SIZE) - 1;
-    var end_row = Math.ceil(p2.x/GRID_SIZE) + 1;
-    var start_col = Math.ceil(p1.y/GRID_SIZE) - 1;
-    var end_col = Math.ceil(p2.y/GRID_SIZE) + 1;
+    let p1 = ctx.transformedPoint(0,0);
+    let p2 = ctx.transformedPoint(canvas.width,canvas.height);
+    let start_row = Math.ceil(p1.x/GRID_SIZE) - 1;
+    let end_row = Math.ceil(p2.x/GRID_SIZE) + 1;
+    let start_col = Math.ceil(p1.y/GRID_SIZE) - 1;
+    let end_col = Math.ceil(p2.y/GRID_SIZE) + 1;
 
-    var low_x = start_row*GRID_SIZE;
-    var low_y = start_col*GRID_SIZE;
-    var high_x = end_row*GRID_SIZE;
-    var high_y = end_col*GRID_SIZE;
+    let low_x = start_row*GRID_SIZE;
+    let low_y = start_col*GRID_SIZE;
+    let high_x = end_row*GRID_SIZE;
+    let high_y = end_col*GRID_SIZE;
 
     if (GRID_LINES) {
-        for (var x=low_x; x<=high_x; x += GRID_SIZE) {
+        for (let x=low_x; x<=high_x; x += GRID_SIZE) {
             ctx.beginPath();
             ctx.moveTo(x, low_y);
             ctx.lineTo(x, high_y);
             ctx.stroke();
         }
 
-        for (var y=low_y; y<=high_y; y += GRID_SIZE) {
+        for (let y=low_y; y<=high_y; y += GRID_SIZE) {
             ctx.beginPath();
             ctx.moveTo(low_x, y);
             ctx.lineTo(high_x, y);
             ctx.stroke();
         }
     }
-    for (var row=start_row; row<=end_row; row++) {
-        for (var col=start_col; col<=end_col; col++) {
+    for (let row=start_row; row<=end_row; row++) {
+        for (let col=start_col; col<=end_col; col++) {
             const item = mod(wall.get(col, row), modulus);
-            var color = colorTable[item];
+            let color = colorTable[item];
             if (color != "white") {
                 ctx.beginPath();
                 ctx.fillStyle = color;
@@ -132,8 +132,7 @@ function draw(ctx) {
 
 }
 
-var IC = new InteractiveCanvas(canvas, draw);
+let IC = new InteractiveCanvas(canvas, draw);
 
 IC.ctx.translate(0,2*GRID_SIZE);
 IC.start();
-

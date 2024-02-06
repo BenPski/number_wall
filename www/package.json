@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/rustwasm/create-wasm-app#readme",
   "dependencies": {
-    "interactive_canvas": "^0.1.0",
+    "interactive_canvas": "^0.2.2",
     "wall": "file:../pkg"
   },
   "devDependencies": {

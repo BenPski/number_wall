@@ -1,7 +1,7 @@
 [package]
 name = "wall"
 version = "0.1.0"
-authors = ["{{authors}}"]
+authors = ["benpski"]
 edition = "2021"
 
 [lib]
